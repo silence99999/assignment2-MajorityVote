@@ -1,0 +1,2 @@
+algorithm,inputSize,comparisons,swaps,arrayAccesses,timeMs,memoryDeltaBytes,timestamp
+MajorityVote-random,10000,20000,0,10000,1,293,0,2025-09-29T16:36:37.612091300Z
