@@ -72,4 +72,16 @@ class MajorityVoteTest {
         assertTrue(tracker.getArrayAccesses() >= nums.length, "Array accesses should be recorded");
         assertTrue(tracker.getElapsedMs() >= 0);
     }
+
+    @Test
+    void testEmptyArrayThrows() {
+        assertThrows(IllegalArgumentException.class, () ->
+                MajorityVote.findMajorityElement(new int[]{}));
+    }
+
+    @Test
+    void testSingleElementArray() {
+        int result = MajorityVote.findMajorityElement(new int[]{42});
+        assertEquals(42, result);
+    }
 }

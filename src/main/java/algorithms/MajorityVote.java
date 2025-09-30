@@ -9,6 +9,9 @@ public class MajorityVote {
             throw new IllegalArgumentException("Input array cannot be null or empty");
         }
 
+        if (nums.length == 1) {
+            return nums[0];
+        }
 
         long comparisons = 0;
         long arrayAccesses = 0;
