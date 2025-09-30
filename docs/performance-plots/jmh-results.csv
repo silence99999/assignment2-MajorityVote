@@ -1,0 +1,5 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99,9%)","Unit","Param: size"
+"benchmark.MajorityVoteBenchmark.runMajorityVote","avgt",1,25,"0,059991","0,001334","us/op",100
+"benchmark.MajorityVoteBenchmark.runMajorityVote","avgt",1,25,"0,657100","0,012711","us/op",1000
+"benchmark.MajorityVoteBenchmark.runMajorityVote","avgt",1,25,"7,536129","0,553385","us/op",10000
+"benchmark.MajorityVoteBenchmark.runMajorityVote","avgt",1,25,"274,570296","11,662031","us/op",100000
