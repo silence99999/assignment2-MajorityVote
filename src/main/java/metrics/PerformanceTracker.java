@@ -5,18 +5,16 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
-
 
 public final class PerformanceTracker {
     private long comparisons;
     private long swaps;
     private long arrayAccesses;
 
-
     private long startTimeNs;
     private long endTimeNs;
-
 
     private long startUsedHeapBytes;
     private long endUsedHeapBytes;
@@ -24,7 +22,6 @@ public final class PerformanceTracker {
     public PerformanceTracker() {
         reset();
     }
-
 
     public synchronized void reset() {
         comparisons = 0;
@@ -36,49 +33,25 @@ public final class PerformanceTracker {
         endUsedHeapBytes = 0;
     }
 
-
     public synchronized void start() {
-        System.gc(); // try to reduce noise (optional; can remove if undesired)
+        System.gc();
         startUsedHeapBytes = getUsedHeapBytes();
         startTimeNs = System.nanoTime();
     }
-
 
     public synchronized void stop() {
         endTimeNs = System.nanoTime();
         endUsedHeapBytes = getUsedHeapBytes();
     }
 
+    public synchronized void incrementComparisons() { comparisons++; }
+    public synchronized void addComparisons(long n) { if (n > 0) comparisons += n; }
 
-    public synchronized void incrementComparisons() {
-        comparisons++;
-    }
+    public synchronized void incrementSwaps() { swaps++; }
+    public synchronized void addSwaps(long n) { if (n > 0) swaps += n; }
 
-
-    public synchronized void addComparisons(long n) {
-        if (n > 0) comparisons += n;
-    }
-
-
-    public synchronized void incrementSwaps() {
-        swaps++;
-    }
-
-
-    public synchronized void addSwaps(long n) {
-        if (n > 0) swaps += n;
-    }
-
-
-    public synchronized void incrementArrayAccesses() {
-        arrayAccesses++;
-    }
-
-
-    public synchronized void addArrayAccesses(long n) {
-        if (n > 0) arrayAccesses += n;
-    }
-
+    public synchronized void incrementArrayAccesses() { arrayAccesses++; }
+    public synchronized void addArrayAccesses(long n) { if (n > 0) arrayAccesses += n; }
 
     public synchronized double getElapsedMs() {
         if (startTimeNs == 0) return 0.0;
@@ -86,24 +59,15 @@ public final class PerformanceTracker {
         return (end - startTimeNs) / 1_000_000.0;
     }
 
-
     public synchronized long getDeltaUsedHeapBytes() {
         if (startUsedHeapBytes == 0) return 0L;
         long end = (endUsedHeapBytes == 0) ? getUsedHeapBytes() : endUsedHeapBytes;
         return end - startUsedHeapBytes;
     }
 
-    public synchronized long getComparisons() {
-        return comparisons;
-    }
-
-    public synchronized long getSwaps() {
-        return swaps;
-    }
-
-    public synchronized long getArrayAccesses() {
-        return arrayAccesses;
-    }
+    public synchronized long getComparisons() { return comparisons; }
+    public synchronized long getSwaps() { return swaps; }
+    public synchronized long getArrayAccesses() { return arrayAccesses; }
 
     private static long getUsedHeapBytes() {
         Runtime rt = Runtime.getRuntime();
@@ -114,7 +78,6 @@ public final class PerformanceTracker {
         Objects.requireNonNull(csvPath, "csvPath");
         Objects.requireNonNull(algorithm, "algorithm");
 
-
         Path parent = csvPath.getParent();
         if (parent != null) Files.createDirectories(parent);
 
@@ -122,17 +85,21 @@ public final class PerformanceTracker {
 
         String header = "algorithm,inputSize,comparisons,swaps,arrayAccesses,timeMs,memoryDeltaBytes,timestamp";
         String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
-        String row = String.format("%s,%d,%d,%d,%d,%.3f,%d,%s%n",
+        // Force US locale to ensure '.' decimal separator
+        String formattedTime = String.format(Locale.US, "%.3f", getElapsedMs());
+
+        String row = String.format(Locale.US,
+                "%s,%d,%d,%d,%d,%s,%d,%s%n",
                 escapeCsv(algorithm),
                 inputSize,
                 comparisons,
                 swaps,
                 arrayAccesses,
-                getElapsedMs(),
+                formattedTime,
                 getDeltaUsedHeapBytes(),
                 timestamp);
 
-        OpenOption[] options = new OpenOption[]{StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND};
+        OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND};
 
         try (BufferedWriter bw = Files.newBufferedWriter(csvPath, java.nio.charset.StandardCharsets.UTF_8, options)) {
             if (writeHeader) {
@@ -143,7 +110,6 @@ public final class PerformanceTracker {
             bw.flush();
         }
     }
-
 
     private static String escapeCsv(String s) {
         if (s == null) return "";
@@ -160,7 +126,7 @@ public final class PerformanceTracker {
                 "comparisons=" + comparisons +
                 ", swaps=" + swaps +
                 ", arrayAccesses=" + arrayAccesses +
-                ", elapsedMs=" + String.format("%.3f", getElapsedMs()) +
+                ", elapsedMs=" + String.format(Locale.US, "%.3f", getElapsedMs()) +
                 ", memoryDeltaBytes=" + getDeltaUsedHeapBytes() +
                 '}';
     }

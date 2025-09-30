@@ -1,2 +1,5 @@
 algorithm,inputSize,comparisons,swaps,arrayAccesses,timeMs,memoryDeltaBytes,timestamp
-MajorityVote-random,10000,20000,0,10000,1,293,0,2025-09-29T16:36:37.612091300Z
+MajorityVote-random,1000,2000,0,1000,0.027,0,2025-09-30T12:02:08.480231200Z
+MajorityVote-sorted,1000,2000,0,1000,0.031,0,2025-09-30T12:02:54.839655200Z
+MajorityVote-sorted,10000,20000,0,10000,0.483,419456,2025-09-30T12:03:05.073868400Z
+MajorityVote-random,100,200,0,100,0.006,0,2025-09-30T12:03:13.017852600Z
